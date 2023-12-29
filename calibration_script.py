@@ -1,7 +1,8 @@
 import numpy as np
-from scipy.optimize import least_squares
+from scipy.optimize import leastsq
 import pandas as pd
 import cv2
+import matplotlib.pyplot as plt
 
 file = 'two_point.csv'
 data = pd.read_csv(file)
@@ -9,8 +10,6 @@ data = pd.read_csv(file)
 world_points = np.array(data[['x', 'y', 'z']],dtype=np.float32)
 image_points = np.array(data[['x_1', 'y_1']],dtype=np.float32)
 image_points_2 = np.array(data[['x_2', 'y_2']],dtype=np.float32)
-
-import numpy as np
 
 def dlt(world_points, image_points):
     assert len(world_points) == len(image_points)
@@ -31,12 +30,6 @@ def dlt(world_points, image_points):
 
     return P
 
-# Usage:
-P = dlt(world_points, image_points_2)
-print(P)
-
-from scipy.optimize import leastsq
-
 def error_function(P, world_points, image_points):
     # Reshape P from a 1D array to a 3x4 matrix
     P = P.reshape(3, 4)
@@ -53,17 +46,6 @@ def error_function(P, world_points, image_points):
 
     return error.ravel()
 
-# Initial guess for P (reshape it to a 1D array)
-P_initial = P.ravel()
-
-# Use least squares to refine P
-P_opt, _ = leastsq(error_function, P_initial, args=(world_points, image_points_2),xtol=1e-40, ftol=1e-40, maxfev=10000)
-
-# Reshape P_opt from a 1D array to a 3x4 matrix
-P_opt = P_opt.reshape(3, 4)
-
-print(P_opt)
-
 def calculate_error(P, world_points, image_points):
     num_points = world_points.shape[0]
 
@@ -79,45 +61,87 @@ def calculate_error(P, world_points, image_points):
 
     return error
 
-import matplotlib.pyplot as plt
-
-def plot_points(image_points, image_points_proj):
+def plot_points(P, image_points, image_points_proj):
     plt.figure()
     plt.scatter(image_points[:, 0], image_points[:, 1], color='blue', label='True Points')
     plt.scatter(image_points_proj[:, 0], image_points_proj[:, 1], color='red', label='Reprojected Points')
-    plt.title('True Points vs Reprojected Points')
+    # Add the movement of the points with arrows
+    for i in range(len(image_points)):
+        plt.arrow(image_points[i, 0], image_points[i, 1], image_points_proj[i, 0] - image_points[i, 0], image_points_proj[i, 1] - image_points[i, 1], color='green', width=0.0005)
+    plt.title(f'True Points vs Reprojected Points with RMS Error: {np.mean(calculate_error(P, world_points, image_points)):.2f}')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.legend()
     plt.show()
 
-# Usage:
-image_points_proj_hom = np.dot(P_opt, np.hstack((world_points, np.ones((world_points.shape[0], 1)))).T).T
-image_points_proj = image_points_proj_hom[:, :2] / image_points_proj_hom[:, 2:]
-plot_points(image_points_2, image_points_proj)
 
-# Plot the points on the image
-img = cv2.imread('calibration_pictures/image2.jpg')
+def view_img(img, point, reprojects, one_by_one=False):
+    n = len(point)
+    if one_by_one == True:
+        for i in range(n):
+            tmp_img = img.copy()
+            tmp_img = cv2.circle(tmp_img, (int(point[i][0]), int(point[i][1])), 25, (255, 0, 255), -1)
+            tmp_img = cv2.circle(tmp_img, (int(reprojects[i][0]), int(reprojects[i][1])), 25, (0, 255, 0), -1)
+            # Add caption with the correct and reprojected points coordinates with big font
+            cv2.putText(tmp_img, 'True: ({}, {})'.format(int(point[i][0]), int(point[i][1])), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+            cv2.putText(tmp_img, 'Reprojected: ({}, {})'.format(int(reprojects[i][0]), int(reprojects[i][1])), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            # Add the 3D point coordinates with small font
+            cv2.putText(tmp_img, '({:.2f}, {:.2f}, {:.2f})'.format(world_points[i][0], world_points[i][1], world_points[i][2]), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+            # Resize the image to 1280x720
+            tmp_img = cv2.resize(tmp_img, (1280, 720))
+            # Show the image
+            cv2.imshow('image', tmp_img)
+            cv2.waitKey(0)
+            # Go to the next image
+            cv2.destroyAllWindows()
+    else:
+        for i in range(n):
+            cv2.circle(img, (int(point[i][0]), int(point[i][1])), 25, (255, 0, 255), -1)
+            cv2.circle(img, (int(reprojects[i][0]), int(reprojects[i][1])), 25, (0, 255, 0), -1)
+            # Add caption with the correct and reprojected points coordinates with big font
+            cv2.putText(img, 'True: ({}, {})'.format(int(point[i][0]), int(point[i][1])), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+            cv2.putText(img, 'Reprojected: ({}, {})'.format(int(reprojects[i][0]), int(reprojects[i][1])), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            # Add the 3D point coordinates with small font
+            cv2.putText(img, '({:.2f}, {:.2f}, {:.2f})'.format(world_points[i][0], world_points[i][1], world_points[i][2]), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+        # Resize the image to 1280x720
+        img = cv2.resize(img, (1280, 720))
+        # Show the image
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
 
-for i in range(len(image_points_2)):
-    tmp_img = img.copy()
-    tmp_img = cv2.circle(tmp_img, (int(image_points_2[i][0]), int(image_points_2[i][1])), 25, (255, 0, 255), -1)
-    tmp_img = cv2.circle(tmp_img, (int(image_points_proj[i][0]), int(image_points_proj[i][1])), 25, (0, 255, 0), -1)
-    # Add caption with the correct and reprojected points coordinates with big font
-    cv2.putText(tmp_img, 'True: ({}, {})'.format(int(image_points_2[i][0]), int(image_points_2[i][1])), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
-    cv2.putText(tmp_img, 'Reprojected: ({}, {})'.format(int(image_points_proj[i][0]), int(image_points_proj[i][1])), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    # Add the 3D point coordinates with small font
-    cv2.putText(tmp_img, '({:.2f}, {:.2f}, {:.2f})'.format(world_points[i][0], world_points[i][1], world_points[i][2]), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
-    # Resize the image to 1280x720
-    tmp_img = cv2.resize(tmp_img, (1280, 720))
-    # Show the image
-    cv2.imshow('image', tmp_img)
-    cv2.waitKey(0)
-    # Go to the next image
-    cv2.destroyAllWindows()
+def main():
+    P1 = dlt(world_points, image_points)
+    P2 = dlt(world_points, image_points_2)
+
+    # Initial guess for P (reshape it to a 1D array)
+    P1_initial = P1.ravel()
+    P2_initial = P2.ravel()
+
+    # Use least squares to refine P
+    P1_opt, _ = leastsq(error_function, P1_initial, args=(world_points, image_points))
+    P2_opt, _ = leastsq(error_function, P2_initial, args=(world_points, image_points_2))
+
+    # Reshape P_opt from a 1D array to a 3x4 matrix
+    P1_opt = P1_opt.reshape(3, 4)
+    P2_opt = P2_opt.reshape(3, 4)
     
-
-# Resize the image to 1280x720
-# img = cv2.resize(img, (1280, 720))
-# cv2.imshow('image', img)
-# cv2.waitKey(0)
+    image_points_proj_hom = np.dot(P1_opt, np.hstack((world_points, np.ones((world_points.shape[0], 1)))).T).T
+    image_points_proj = image_points_proj_hom[:, :2] / image_points_proj_hom[:, 2:]
+    image_points_2_proj_hom = np.dot(P2_opt, np.hstack((world_points, np.ones((world_points.shape[0], 1)))).T).T
+    image_points_2_proj = image_points_2_proj_hom[:, :2] / image_points_2_proj_hom[:, 2:]
+    plot_points(P1_opt, image_points, image_points_proj)
+    plot_points(P2_opt, image_points_2, image_points_2_proj)
+    
+    # Show the images with the true and reprojected points
+    img1 = cv2.imread('calibration_pictures/image1.jpg')
+    img2 = cv2.imread('calibration_pictures/image2.jpg')
+    
+    view_img(img1, image_points, image_points_proj)
+    view_img(img2, image_points_2, image_points_2_proj)
+    
+    # Save the two projection matrices
+    np.savetxt('P1.txt', P1_opt)
+    np.savetxt('P2.txt', P2_opt)
+    
+if __name__ == '__main__':
+    main()
