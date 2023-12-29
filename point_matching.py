@@ -3,7 +3,7 @@ from scipy.optimize import least_squares
 import pandas as pd
 import cv2
 
-file = 'two_point.csv'
+file = 'data/two_point.csv'
 data = pd.read_csv(file)
 
 world_points = np.array(data[['x', 'y', 'z']],dtype=np.float32)

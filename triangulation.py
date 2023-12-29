@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 
 # Load the matrix from the file
-P1 = np.loadtxt('P1.txt')
-P2 = np.loadtxt('P2.txt')
+P1 = np.loadtxt('data/P1.txt')
+P2 = np.loadtxt('data/P2.txt')
 
 # The points to project
 
-points_2d = pd.read_csv('points_2d.csv')
+points_2d = pd.read_csv('data/points_2d.csv')
 p1_points = np.array(points_2d[['x_1', 'y_1']], dtype=np.float32)
 p2_points = np.array(points_2d[['x_2', 'y_2']], dtype=np.float32)
 

@@ -4,7 +4,7 @@ import pandas as pd
 import cv2
 import matplotlib.pyplot as plt
 
-file = 'two_point.csv'
+file = 'data/two_point.csv'
 data = pd.read_csv(file)
 
 world_points = np.array(data[['x', 'y', 'z']],dtype=np.float32)
@@ -140,8 +140,8 @@ def main():
     view_img(img2, image_points_2, image_points_2_proj)
     
     # Save the two projection matrices
-    np.savetxt('P1.txt', P1_opt)
-    np.savetxt('P2.txt', P2_opt)
+    np.savetxt('data/P1.txt', P1_opt)
+    np.savetxt('data/P2.txt', P2_opt)
     
 if __name__ == '__main__':
     main()

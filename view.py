@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-file = 'points.csv'
+file = 'data/points.csv'
 
 pd.set_option('display.max_columns', None)
 data = pd.read_csv(file)
