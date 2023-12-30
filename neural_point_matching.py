@@ -37,14 +37,16 @@ img_file_name = 'calibration_pictures/image1.jpg'
 img_2_file_name = 'calibration_pictures/image2.jpg'
 detection_thresh = 0.09
 nms_radius = 10
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = SuperPoint(detection_threshold=detection_thresh, nms_radius=nms_radius).eval()
-weights = torch.load('superpoint_v6_from_tf.pth')
+weights = torch.load('superpoint_v6_from_tf.pth',map_location=device)
 model.load_state_dict(weights)
+
 
 img1 = cv2.imread(img_file_name)
 img2 = cv2.imread(img_2_file_name)
 
-images = [img_file_name, img_2_file_name]
+images = [img_2_file_name, img_file_name]
 img_processed = []
 for img in images:
     img_processed.append(cv2.imread(img).mean(-1) / 255.)
@@ -64,16 +66,21 @@ with torch.no_grad():
 descriptors1 = pred_th['descriptors'][0].cpu().numpy()
 descriptors2 = pred_th['descriptors'][1].cpu().numpy()
 
-# Find the best matches using the descriptors
-matches = []
-for desc1 in descriptors1:
-    scores = []
-    for desc2 in descriptors2:
-        scores.append(np.linalg.norm(desc1 - desc2))
-    matches.append(np.argmin(scores))
-    
-matches = sorted([(i, m) for i, m in enumerate(matches)], key=lambda x: x[1])
-img3 = cv2.drawMatches(img1, pred_th['keypoints'][0].cpu().numpy(), img2, pred_th['keypoints'][1].cpu().numpy(), matches[:20], 1, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+# Initialize the BFMatcher
+bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+
+# Match descriptors
+matches = bf.match(descriptors1, descriptors2)
+
+# Sort matches by distance (the lower the better)
+matches = sorted(matches, key=lambda x: x.distance)
+
+# Convert keypoints to cv2.KeyPoint objects
+keypoints1 = [cv2.KeyPoint(x=f[0], y=f[1], size=20) for f in pred_th['keypoints'][0].cpu().numpy()]
+keypoints2 = [cv2.KeyPoint(x=f[0], y=f[1], size=20) for f in pred_th['keypoints'][1].cpu().numpy()]
+
+# Draw the top matches
+img3 = cv2.drawMatches(img1, keypoints1, img2, keypoints2, matches[:20], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS, matchesThickness=10)
 
 img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
 img3 = cv2.resize(img3, (1280, 720))

@@ -5,25 +5,32 @@ import numpy as np
 img1 = cv2.imread('calibration_pictures/image1.jpg', cv2.IMREAD_GRAYSCALE)
 img2 = cv2.imread('calibration_pictures/image2.jpg', cv2.IMREAD_GRAYSCALE)
 
-# Initialize the StereoSGBM matcher
-window_size = 5
-min_disp = 32
-num_disp = 112-min_disp
-stereo = cv2.StereoSGBM_create(minDisparity = min_disp,
-    numDisparities = num_disp,
-    blockSize = 16,
-    P1 = 8*3*window_size**2,
-    P2 = 32*3*window_size**2,
-    disp12MaxDiff = 1,
-    uniquenessRatio = 10,
-    speckleWindowSize = 100,
-    speckleRange = 32
-)
+# Match the features
+orb = cv2.ORB_create()
+kp1, des1 = orb.detectAndCompute(img1, None)
+kp2, des2 = orb.detectAndCompute(img2, None)
 
-# Compute the disparity map
-disparity = stereo.compute(img1, img2).astype(np.float32) / 16.0
+# Use FLANN to match the descriptors
+FLANN_INDEX_KDTREE = 1
+index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
 
-# Display the disparity map
-cv2.imshow('Disparity Map', disparity)
+search_params = dict(checks=50)
+flann = cv2.FlannBasedMatcher(index_params, search_params)
+matches = flann.knnMatch(des1, des2, k=2)
+
+good = []
+for m, n in matches:
+    if m.distance < 0.7*n.distance:
+        good.append(m)
+        
+# Draw the first 10 matches
+img3 = cv2.drawMatches(img1, kp1, img2, kp2, good[:10], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS, matchesThickness=10)
+
+
+
+# Show the image
+# Resize the image to fit the screen
+img3 = cv2.resize(img3, (0, 0), fx=0.2, fy=0.2)
+cv2.imshow('Matches', img3)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
