@@ -7,7 +7,7 @@ P2 = np.loadtxt('data/P2.txt')
 
 # The points to project
 
-points_2d = pd.read_csv('data/points_2d_t.csv')
+points_2d = pd.read_csv('data/keypoints.csv')
 p1_points = np.array(points_2d[['x_1', 'y_1']], dtype=np.float32)
 p2_points = np.array(points_2d[['x_2', 'y_2']], dtype=np.float32)
 
@@ -27,7 +27,10 @@ for i in range(len(p1_points)):
     points_3d[i] = V[-1]
     
 points_3d = points_3d[:, :3] / points_3d[:, 3:]
-print(points_3d)
+
+# Print them as x,y,z coordinates with 3 decimals
+for i in range(len(points_3d)):
+    print('({:.3f}, {:.3f}, {:.3f})'.format(points_3d[i][0], points_3d[i][1], points_3d[i][2]))
 
 # Plot the points
 import matplotlib.pyplot as plt
