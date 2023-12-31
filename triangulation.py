@@ -32,12 +32,15 @@ points_3d = points_3d[:, :3] / points_3d[:, 3:]
 for i in range(len(points_3d)):
     print('({:.3f}, {:.3f}, {:.3f})'.format(points_3d[i][0], points_3d[i][1], points_3d[i][2]))
 
+points_true = pd.read_csv('data/points.csv')
+
 # Plot the points
 import matplotlib.pyplot as plt
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(points_3d[:, 0], points_3d[:, 1], points_3d[:, 2], c='r', marker='o')
+ax.scatter(points_true['x'], points_true['y'], points_true['z'], c='b', marker='o')
 ax.set_xlabel('X Label')
 ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')

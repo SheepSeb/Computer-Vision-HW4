@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-file = 'data/points.csv'
+file = 'data/points_3d.csv'
 
 pd.set_option('display.max_columns', None)
 data = pd.read_csv(file)
@@ -23,5 +23,5 @@ points = np.array(data[['x', 'y', 'z']])
 cloud = pv.PolyData(points)
 
 # 3D Delaunay triangulation
-surf = cloud.delaunay_3d(alpha=30)
+surf = cloud.delaunay_3d(alpha=2)
 surf.plot(show_edges=True, line_width=5)
