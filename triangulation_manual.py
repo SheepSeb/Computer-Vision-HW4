@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 P1 = np.loadtxt('data/P1_new.txt')
 P2 = np.loadtxt('data/P2_new.txt')
 
-kpt1 = np.loadtxt('data/kpts0.txt')
-kpt2 = np.loadtxt('data/kpts1.txt')
+kpt1 = np.loadtxt('data/kpts0_manual.txt')
+kpt2 = np.loadtxt('data/kpts1_manual.txt')
 
 # Triangulate the points
 points_3d = cv2.triangulatePoints(P1, P2, kpt1.T, kpt2.T).T

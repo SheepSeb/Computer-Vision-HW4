@@ -33,8 +33,8 @@ def plot_imgs(imgs, titles=None, cmap='brg', ylabel='', normalize=False, ax=None
     ax[0].set_ylabel(ylabel)
     plt.tight_layout()
 
-img_file_name = 'calibration_pictures/image1.jpg'
-img_2_file_name = 'calibration_pictures/image2.jpg'
+img_file_name = 'calibration_pictures/front.jpg'
+img_2_file_name = 'calibration_pictures/side.jpg'
 detection_thresh = 0.09
 nms_radius = 10
 model = SuperPoint(detection_threshold=detection_thresh, nms_radius=nms_radius).eval()
@@ -73,7 +73,8 @@ for desc1 in descriptors1:
     matches.append(np.argmin(scores))
     
 matches = sorted([(i, m) for i, m in enumerate(matches)], key=lambda x: x[1])
-img3 = cv2.drawMatches(img1, pred_th['keypoints'][0].cpu().numpy(), img2, pred_th['keypoints'][1].cpu().numpy(), matches[:20], 1, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+img3 = cv2.drawMatches(img1, pred_th['keypoints'][0].cpu().numpy(), img2, pred_th['keypoints'][1].cpu().numpy(), matches[:20], None, flags=2,matchesThickness=3)
 
 img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
 img3 = cv2.resize(img3, (1280, 720))
