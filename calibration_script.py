@@ -141,8 +141,8 @@ def main():
     view_img(img2, image_points_2, image_points_2_proj)
     
     # Save the two projection matrices
-    np.savetxt('data/P1_new.txt', P1_opt)
-    np.savetxt('data/P2_new.txt', P2_opt)
+    # np.savetxt('data/P1_new.txt', P1_opt)
+    # np.savetxt('data/P2_new.txt', P2_opt)
     
 if __name__ == '__main__':
     main()
