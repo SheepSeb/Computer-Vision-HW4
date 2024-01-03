@@ -4,8 +4,9 @@ import pandas as pd
 import cv2
 import matplotlib.pyplot as plt
 
-file = 'data/two_point.csv'
+file = 'data/P1_calib.csv'
 data = pd.read_csv(file)
+data.head()
 
 world_points = np.array(data[['x', 'y', 'z']],dtype=np.float32)
 image_points = np.array(data[['x_1', 'y_1']],dtype=np.float32)
@@ -133,15 +134,15 @@ def main():
     plot_points(P2_opt, image_points_2, image_points_2_proj)
     
     # Show the images with the true and reprojected points
-    img1 = cv2.imread('calibration_pictures/image1.jpg')
-    img2 = cv2.imread('calibration_pictures/image2.jpg')
+    img1 = cv2.imread('calibration_pictures/front.jpg')
+    img2 = cv2.imread('calibration_pictures/side.jpg')
     
     view_img(img1, image_points, image_points_proj)
     view_img(img2, image_points_2, image_points_2_proj)
     
     # Save the two projection matrices
-    np.savetxt('data/P1.txt', P1_opt)
-    np.savetxt('data/P2.txt', P2_opt)
+    np.savetxt('data/P1_new.txt', P1_opt)
+    np.savetxt('data/P2_new.txt', P2_opt)
     
 if __name__ == '__main__':
     main()
