@@ -37,7 +37,7 @@ $\lambda x_{i} = \begin{bmatrix} p_{i1} & p_{i2} & p_{i3} & p_{i4} \\\ p_{i5} & 
 ```
 $x_{i} * P X_i = 0$
 ```math
-$\begin{bmatrix} 0 && -X_i^T && y_iX_i^T \\\ X_i^T && 0 && -x_iX_i^T \\\ -y_iX_i^T && x_iX_i^T && 0 \end{bmatrix} \begin{bmatrix} P1 \\\ P2 \\\ P3 \end{bmatrix} = 0$
+\begin{bmatrix} 0 && -X_i^T && y_iX_i^T \\\ X_i^T && 0 && -x_iX_i^T \\\ -y_iX_i^T && x_iX_i^T && 0 \end{bmatrix} \begin{bmatrix} P1 \\\ P2 \\\ P3 \end{bmatrix} = 0$
 ```
 A simpler form of the equation is:
 
