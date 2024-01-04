@@ -30,8 +30,7 @@ cloud.plot(show_edges=True, line_width=0.1, color='w', background='black')
 
 # Create a mesh from the Delaunay triangulation using PyVista
 mesh = cloud.delaunay_3d(alpha=1)
-texture = pv.read_texture('calibration_pictures/front.jpg')
+texture = pv.read_texture('calibration_pictures/front_2.jpg')
 texture2 = pv.read_texture('calibration_pictures/side.jpg')
-
 mesh = mesh.texture_map_to_plane(inplace=True)
 mesh.plot(show_edges=True, line_width=0.1, texture=texture, background='black')
