@@ -33,8 +33,8 @@ def plot_imgs(imgs, titles=None, cmap='brg', ylabel='', normalize=False, ax=None
     ax[0].set_ylabel(ylabel)
     plt.tight_layout()
 
-img_file_name = 'calibration_pictures/image1.jpg'
-img_2_file_name = 'calibration_pictures/image2.jpg'
+img_file_name = 'calibration_pictures/front_2_t.jpg'
+img_2_file_name = 'calibration_pictures/side_2_t.jpg'
 detection_thresh = 0.09
 nms_radius = 10
 model = SuperPoint(detection_threshold=detection_thresh, nms_radius=nms_radius).eval()
@@ -54,29 +54,30 @@ images = np.stack([i[:h,:w] for i in img_processed])
 
 with torch.no_grad():
     pred_th = model({'image': torch.from_numpy(images[:,None]).float()})
-# plot_imgs(images, cmap='gray')
-# for p, ax in zip(pred_th['keypoints'], plt.gcf().axes):
-#     ax.scatter(*p.T, lw=0, s=4, c='lime')
+plot_imgs(images, cmap='gray')
+for p, ax in zip(pred_th['keypoints'], plt.gcf().axes):
+    ax.scatter(*p.T, lw=0, s=4, c='lime')
     
-# plt.show()
+plt.show()
 
-# Find the best matches using the descriptors
-descriptors1 = pred_th['descriptors'][0].cpu().numpy()
-descriptors2 = pred_th['descriptors'][1].cpu().numpy()
+# # Find the best matches using the descriptors
+# descriptors1 = pred_th['descriptors'][0].cpu().numpy()
+# descriptors2 = pred_th['descriptors'][1].cpu().numpy()
 
-# Find the best matches using the descriptors
-matches = []
-for desc1 in descriptors1:
-    scores = []
-    for desc2 in descriptors2:
-        scores.append(np.linalg.norm(desc1 - desc2))
-    matches.append(np.argmin(scores))
+# # Find the best matches using the descriptors
+# matches = []
+# for desc1 in descriptors1:
+#     scores = []
+#     for desc2 in descriptors2:
+#         scores.append(np.linalg.norm(desc1 - desc2))
+#     matches.append(np.argmin(scores))
     
-matches = sorted([(i, m) for i, m in enumerate(matches)], key=lambda x: x[1])
-img3 = cv2.drawMatches(img1, pred_th['keypoints'][0].cpu().numpy(), img2, pred_th['keypoints'][1].cpu().numpy(), matches[:20], 1, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+# matches = sorted([(i, m) for i, m in enumerate(matches)], key=lambda x: x[1])
 
-img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
-img3 = cv2.resize(img3, (1280, 720))
-cv2.imshow('Matches', img3)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# img3 = cv2.drawMatches(img1, pred_th['keypoints'][0].cpu().numpy(), img2, pred_th['keypoints'][1].cpu().numpy(), matches[:20], None, flags=2,matchesThickness=3)
+
+# img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
+# img3 = cv2.resize(img3, (1280, 720))
+# cv2.imshow('Matches', img3)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()

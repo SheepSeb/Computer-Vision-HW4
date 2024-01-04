@@ -1,47 +1,36 @@
 import numpy as np
 import pandas as pd
-
-# Load the matrix from the file
-P1 = np.loadtxt('data/P1.txt')
-P2 = np.loadtxt('data/P2.txt')
-
-# The points to project
-
-points_2d = pd.read_csv('data/keypoints.csv')
-p1_points = np.array(points_2d[['x_1', 'y_1']], dtype=np.float32)
-p2_points = np.array(points_2d[['x_2', 'y_2']], dtype=np.float32)
-
-# Trinaguale the points in order to give the 3D points
-# The 3D points are the same for both cameras
-
-points_3d = np.zeros((len(p1_points), 4), dtype=np.float32)
-
-for i in range(len(p1_points)):
-    p1 = p1_points[i]
-    p2 = p2_points[i]
-    A = np.array([[p1[0]*P1[2, 0] - P1[0, 0], p1[0]*P1[2, 1] - P1[0, 1], p1[0]*P1[2, 2] - P1[0, 2], p1[0]*P1[2, 3] - P1[0, 3]],
-                  [p1[1]*P1[2, 0] - P1[1, 0], p1[1]*P1[2, 1] - P1[1, 1], p1[1]*P1[2, 2] - P1[1, 2], p1[1]*P1[2, 3] - P1[1, 3]],
-                  [p2[0]*P2[2, 0] - P2[0, 0], p2[0]*P2[2, 1] - P2[0, 1], p2[0]*P2[2, 2] - P2[0, 2], p2[0]*P2[2, 3] - P2[0, 3]],
-                  [p2[1]*P2[2, 0] - P2[1, 0], p2[1]*P2[2, 1] - P2[1, 1], p2[1]*P2[2, 2] - P2[1, 2], p2[1]*P2[2, 3] - P2[1, 3]]])
-    _, _, V = np.linalg.svd(A)
-    points_3d[i] = V[-1]
-    
-points_3d = points_3d[:, :3] / points_3d[:, 3:]
-
-# Print them as x,y,z coordinates with 3 decimals
-for i in range(len(points_3d)):
-    print('({:.3f}, {:.3f}, {:.3f})'.format(points_3d[i][0], points_3d[i][1], points_3d[i][2]))
-
-points_true = pd.read_csv('data/points.csv')
-
-# Plot the points
+import cv2
+import pyvista as pv
+import os
 import matplotlib.pyplot as plt
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(points_3d[:, 0], points_3d[:, 1], points_3d[:, 2], c='r', marker='o')
-ax.scatter(points_true['x'], points_true['y'], points_true['z'], c='b', marker='o')
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-plt.show()
+# Load the matrix from the file
+P1 = np.loadtxt('data/P1_new.txt')
+P2 = np.loadtxt('data/P2_new.txt')
+
+kpt1 = np.loadtxt('data/kpts0.txt')
+kpt2 = np.loadtxt('data/kpts1.txt')
+
+# Triangulate the points
+points_3d = cv2.triangulatePoints(P1, P2, kpt1.T, kpt2.T).T
+
+# Convert from homogeneous coordinates to Euclidean coordinates
+points_3d_euclidean = points_3d[:, :3] / points_3d[:, 3:]
+
+from scipy.spatial import ConvexHull,Delaunay
+
+# Create a Delaunay triangulation
+tri = ConvexHull(points_3d_euclidean)
+triangulation = Delaunay(points_3d_euclidean)
+
+# Plot the mesh
+cloud = pv.PolyData(points_3d_euclidean)
+cloud.plot(show_edges=True, line_width=0.1, color='w', background='black')
+
+# Create a mesh from the Delaunay triangulation using PyVista
+mesh = cloud.delaunay_3d(alpha=1)
+texture = pv.read_texture('calibration_pictures/front_2.jpg')
+texture2 = pv.read_texture('calibration_pictures/side.jpg')
+mesh = mesh.texture_map_to_plane(inplace=True)
+mesh.plot(show_edges=True, line_width=0.1, texture=texture, background='black')
