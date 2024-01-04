@@ -18,9 +18,9 @@ Where:
 - $X$ is the world coordonates in homogenous coordonates
 
 We can rewrite the equation as:
-
+```math
 $[\lambda x_1, \lambda  x_2, \lambda] = \begin{bmatrix} f_x & 0 & c_x \\\ 0 & f_y & c_y \\\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\\ r_{21} & r_{22} & r_{23} & t_2 \\\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X_1 \\\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
-
+```
 We can rewrite the equation as:
 
 $\begin{bmatrix} \lambda x_1 \\\ \lambda x_2 \\\ \lambda \end{bmatrix} = \begin{bmatrix} f_x r_{11} + c_x r_{31} & f_x r_{12} + c_x r_{32} & f_x r_{13} + c_x r_{33} & f_x t_1 + c_x t_3 \\\ f_y r_{21} + c_y r_{31} & f_y r_{22} + c_y r_{32} & f_y r_{23} + c_y r_{33} & f_y t_2 + c_y t_3 \\\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X_1 \\\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
