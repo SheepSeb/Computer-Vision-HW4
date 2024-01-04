@@ -19,24 +19,26 @@ Where:
 
 We can rewrite the equation as:
 ```math
-$[\lambda x_1, \lambda  x_2, \lambda] = \begin{bmatrix} f_x & 0 & c_x \\\ 0 & f_y & c_y \\\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\\ r_{21} & r_{22} & r_{23} & t_2 \\\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X_1 \\\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
+[\lambda x_1, \lambda  x_2, \lambda] = \begin{bmatrix} f_x & 0 & c_x \\\ 0 & f_y & c_y \\\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\\ r_{21} & r_{22} & r_{23} & t_2 \\\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X_1 \\\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
 ```
 We can rewrite the equation as:
 
-$\begin{bmatrix} \lambda x_1 \\\ \lambda x_2 \\\ \lambda \end{bmatrix} = \begin{bmatrix} f_x r_{11} + c_x r_{31} & f_x r_{12} + c_x r_{32} & f_x r_{13} + c_x r_{33} & f_x t_1 + c_x t_3 \\\ f_y r_{21} + c_y r_{31} & f_y r_{22} + c_y r_{32} & f_y r_{23} + c_y r_{33} & f_y t_2 + c_y t_3 \\\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X_1 \\\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
+```math
+\begin{bmatrix} \lambda x_1 \\\ \lambda x_2 \\\ \lambda \end{bmatrix} = \begin{bmatrix} f_x r_{11} + c_x r_{31} & f_x r_{12} + c_x r_{32} & f_x r_{13} + c_x r_{33} & f_x t_1 + c_x t_3 \\\ f_y r_{21} + c_y r_{31} & f_y r_{22} + c_y r_{32} & f_y r_{23} + c_y r_{33} & f_y t_2 + c_y t_3 \\\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X_1 \\\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
+```
 
 And to solve it by least squares we can rewrite it as follows:
 
 $\lambda x_{i} = P X_i$
 
 This can be rewritten as:
-
+```math
 $\lambda x_{i} = \begin{bmatrix} p_{i1} & p_{i2} & p_{i3} & p_{i4} \\\ p_{i5} & p_{i6} & p_{i7} & p_{i8} \\\ p_{i9} & p_{i10} & p_{i11} & p_{i12} \end{bmatrix} \begin{bmatrix} X_1 \\ X_2 \\\ X_3 \\\ 1 \end{bmatrix}$
-
+```
 $x_{i} * P X_i = 0$
-
+```math
 $\begin{bmatrix} 0 && -X_i^T && y_iX_i^T \\\ X_i^T && 0 && -x_iX_i^T \\\ -y_iX_i^T && x_iX_i^T && 0 \end{bmatrix} \begin{bmatrix} P1 \\\ P2 \\\ P3 \end{bmatrix} = 0$
-
+```
 A simpler form of the equation is:
 
 $A p = 0$
