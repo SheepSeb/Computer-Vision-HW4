@@ -103,3 +103,25 @@ For the second attempt without the background the results can be seen in the fol
 For the texture mapping I continued using the point cloud and the triangulation from the previous step. For a simple texture mapping I just applied the texture from the image to the mesh. The results can be seen in the following image:
 
 ![Image 9](results/texture_v1.gif)
+
+Without the texture to be repeated the results can be seen in the following image:
+
+![Image 10](results/texture_v2.gif)
+
+## Additional Results
+
+In order to achive better results I have used the following techniques:
+- Removing the background from the images
+- Segmented the images to obtain
+- Used DreamGaussian on the segmented images to obtain each object mesh
+- Used the meshes to create the final mesh
+
+DreamGaussian:
+
+
+Segmentation:
+
+Shap-E:
+
+
+The results can be seen in the following image:
