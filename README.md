@@ -116,12 +116,23 @@ In order to achive better results I have used the following techniques:
 - Used DreamGaussian on the segmented images to obtain each object mesh
 - Used the meshes to create the final mesh
 
-DreamGaussian:
+Better point cloud from Point-E: https://openai.com/research/point-e 
 
+![Image 13](results/point.gif)
 
-Segmentation:
+The meshes can be seen in the following image:
 
-Shap-E:
+![Image 14](results/mesh.gif)
 
+DreamGaussian: https://dreamgaussian.github.io/
 
+Segmentation: https://segment-anything.com/
+![Image 15](results/box.png)
+![Image 16](results/bunny.png)
+
+Shap-E: https://arxiv.org/abs/2305.02463
 The results can be seen in the following image:
+![Image 11](results/single.gif)
+
+Using multiple actors in the scene:
+![Image 12](results/multi.gif)
