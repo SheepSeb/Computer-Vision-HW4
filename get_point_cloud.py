@@ -19,4 +19,5 @@ picka.rotate(R, center=(0, 0, 0))
 mickey.translate((1.45, 0, -1.65))
 mickey.rotate(R, center=(0, 0, 0))
 # Visualize the scene
-o3d.visualization.draw_geometries([bunny])
+o3d.visualization.draw_geometries([bunny,box])
+o3d.visualization.draw_geometries([bunny,box,picka,mickey])
